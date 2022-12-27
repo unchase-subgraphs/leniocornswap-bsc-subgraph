@@ -1,4 +1,6 @@
 specVersion: 0.0.5
+description: Leonicorn Swap is an advanced Automated Market Maker AMM based, dual token model, decentralised exchange (DEX) with multifunctional features. Our aim is to deliver the next generation of efficient DeFi solutions built on blockchain technology. A user-friendly and security focused DeFi solution built for, and run for, you - with access to unparalleled live support, and vibrant online communities.
+repository: https://github.com/unchase-subgraphs/leniocornswap-bsc-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
@@ -8,19 +10,46 @@ dataSources:
     source:
       address: "0xEB10f4Fe2A57383215646b4aC0Da70F8EDc69D4F"
       abi: Factory
+      startBlock: 11736511
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - OwnershipTransferred
-        - PairCreated
+        - Pair
+        - Token
       abis:
         - name: Factory
           file: ./abis/Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
       file: ./src/factory.ts
+templates:
+  - kind: ethereum/contract
+    name: Pair
+    network: bsc
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/core.ts
+      entities:
+        - Pair
+        - Token
+      abis:
+        - name: Pair
+          file: ./abis/pair.json
+        - name: Factory
+          file: ./abis/factory.json
+      eventHandlers:
+        - event: Sync(uint112,uint112)
+          handler: handleSync
